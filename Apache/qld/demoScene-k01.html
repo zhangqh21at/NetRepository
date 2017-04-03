@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+    <title>21AT GeoCube Queensland Demo</title>
+    <link rel="stylesheet" type="text/css" href="../lib/font-awesome/css/font-awesome.min.css" >
+    <link rel="stylesheet" type="text/css" href="../lib/leaflet/leaflet.css">
+    <link rel="stylesheet" type="text/css" href="../lib/leaflet/plugins/leaflet.draw.css">
+    <link rel="stylesheet" type="text/css" href="../lib/leaflet/plugins/leaflet-measure.css">
+    <link rel="stylesheet" type="text/css" href="../lib/leaflet/plugins/leaflet-sidebar.min.css">
+    <style type="text/css">
+    body {
+        padding: 0;
+        margin: 0;
+		font-size:10px;
+    }
+    html, body, #map {
+        height: 100%;
+    }
+    </style>
+
+    <script type="text/javascript" src="../lib/jquery.js" ></script>
+    <script type="text/javascript" src="../lib/jquery.lazyload.js" ></script>
+    <script type="text/javascript" src="../lib/leaflet/leaflet.js" ></script>
+    <script type="text/javascript" src='../lib/leaflet/plugins/leaflet.wms.js'></script>
+    <script type="text/javascript" src='../lib/leaflet/plugins/leaflet-tilelayer-wmts.js'></script>
+    <script type="text/javascript" src='../lib/leaflet/plugins/L.Control.MousePosition.js'></script>
+    <script type="text/javascript" src='../lib/leaflet/plugins/L.ImageTransform.js'></script>
+    <script type="text/javascript" src='../lib/leaflet/plugins/leaflet.ChineseTmsProviders.js'></script>
+</head>
+<body>
+
+<div id='map'></div>
+
+
+</body>
+<script type="text/javascript">
+var osm = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'}),
+
+	normalm = L.tileLayer.chinaProvider('TianDiTuEn.Normal.Map',{maxZoom:19,minZoom:1,attribution: '&copy; Data:<a href="http://en.tianditu.com/">Tianditu</a>'}),
+    normala = L.tileLayer.chinaProvider('TianDiTuEn.Normal.Annotion',{maxZoom:19,minZoom:1,attribution: '&copy; Data:<a href="http://en.tianditu.com/">Tianditu</a>'}),
+	imagery_qld_cgi = L.tileLayer.wms('http://128.0.67.55:8081/gcscgi',{'layers':'GCSScene',format:'image/png',transparent:true,maxZoom:22,minZoom:1,attribution:'&copy 21AT GeoCube'});	
+	imagery_qld_py = L.tileLayer.wms('http://128.0.67.55:8081/gcspy/qld20161202002001',{'layers':'GCSScene',format:'image/png',transparent:true,maxZoom:22,minZoom:1,attribution:'&copy 21AT GeoCube'}),
+    // 2017-01-18
+    imagery_qld_mp_wms = L.tileLayer.wms('http://128.0.67.55:8081/qldscene/token833769810323949CFCB9C89C7B6733D1/service?',{'layers':'TRIPLESAT_1_PSH_L4_20160428010231_0003FBVI_008_RGB',format:'image/png',transparent:true,maxZoom:22,minZoom:1,attribution:'&copy 21AT GeoCube'}),
+    imagery_qld_mp_wmts_kvp = L.tileLayer.wmts('http://128.0.67.55:8081/qldscene/token833769810323949CFCB9C89C7B6733D1/service?',{'layer':'TRIPLESAT_1_PSH_L4_20160428010231_0003FBVI_008_RGB',format:'image/png',tilematrixSet:'webmercator',transparent:true,maxZoom:22,minZoom:1,attribution:'&copy 21AT GeoCube'}),
+    imagery_qld_mp_wmts = L.tileLayer('http://128.0.67.55:8081/qldscene/token833769810323949CFCB9C89C7B6733D1/wmts/TRIPLESAT_1_PSH_L4_20160428010231_0003FBVI_008_RGB/webmercator/{z}/{x}/{y}.png?',{maxZoom:22,minZoom:1,attribution:'&copy 21AT GeoCube'}),
+    imagery_qld_mp_tms = L.tileLayer('http://128.0.67.55:8081/qldscene/token833769810323949CFCB9C89C7B6733D1/tms/1.0.0/TRIPLESAT_1_PSH_L4_20160428010231_0003FBVI_008_RGB/webmercator/{z}/{x}/{y}.png?',{tms:true,zoomOffset:-1,maxZoom:22,minZoom:1,attribution:'&copy 21AT GeoCube'});
+
+
+var normal_t = L.layerGroup([normalm,normala]);
+
+
+var baseLayers = {
+    "OpenStreetMap":osm,
+
+    "Tiantidu":normal_t,
+}
+
+var overlayLayers = {
+    "QLD Service CGI WMS":imagery_qld_cgi,
+    "QLD Service PY WMS":imagery_qld_py,
+    "QLD Service MP WMS":imagery_qld_mp_wms,
+    "QLD Service MP WMTS KVP":imagery_qld_mp_wmts_kvp,
+    "QLD Service MP WMTS REST":imagery_qld_mp_wmts,
+    "QLD Service MP TMS":imagery_qld_mp_tms,
+
+};
+
+
+var map = L.map("map",{
+//    center:[40.60, 116.49],
+//    zoom:6,
+//    layers:[normal,imagery],
+    center:[-22, 149.75],//149.6441592 -21.7112256 149.9281488 -21.449664
+    zoom:5,
+    //layers:[osm,imagery_qld_cgi],
+    layers:[imagery_qld_mp_wms],
+	maxZoom:19,
+	minZoom:1,
+
+	crs: L.CRS.EPSG3857,
+    zoomControl:false,
+});
+
+L.control.zoom({zoomInTitle:'ZoomIn', zoomOutTitle:'ZoomOut'}).addTo(map);
+L.control.mousePosition().addTo(map);
+
+L.control.layers(baseLayers,overlayLayers).addTo(map);
+//L.control.layers(overlayLayers).addTo(map);
+
+</script>
+</html>
